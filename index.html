@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will you be my valentine?</title>
+    <style>
+    body {
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      position: relative;
+      background-color: #ffe1eb;
+    }
+
+    .rectangle {
+      width: 700px;
+      height: 400px;
+      background-color: #ffffff;
+      border-radius: 45px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30px 20px 20px 20px;
+      position: relative;
+    }
+
+    .question-image {
+      position: absolute;
+      bottom: 260px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: auto;
+      max-height: 180px;
+      object-fit: contain;
+    }
+
+    h1 {
+      margin: 0;
+      color: #000000;
+      font-size: 32px;
+      position: absolute;
+      bottom: 190px;
+      text-align: center;
+      width: 100%;
+    }
+
+    button {
+      width: 70px;
+      height: 50px;
+      padding: 12px 24px;
+      font-size: 15px;
+      cursor: pointer;
+      border: none;
+      border-radius: 150px;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #ff4d7d;
+    }
+
+    #yes {
+      position: absolute;
+      bottom: 70px;
+      left: 45%;
+      --yes-scale: 1;
+      transform: translateX(-70px) scale(var(--yes-scale));
+      transform-origin: center;
+      background-color: #ff6b9d;
+    }
+
+    #no {
+      position: absolute;
+      bottom: 70px;
+      right: 45%;
+      --no-scale: 1;
+      transform: translateX(70px) scale(var(--no-scale));
+      transform-origin: center;
+      background-color: #aaa4a6;
+    }
+  </style>
+  </head>
+  <body>
+    <div class="rectangle">
+      <img class="question-image" src="./IMG_4504.JPG" alt="">
+      <h1>Beatrice, will you be my valentine?</h1>
+      <button id="yes">Yes</button>
+      <button id="no">No</button>
+    </div>
+
+    <script>
+      const noButton = document.getElementById('no');
+      const yesButton = document.getElementById('yes');
+      const rectangle = document.querySelector('.rectangle');
+      let yesScale = 1;
+      const yesMaxScale = 2;
+      const yesGrowthStep = 0.01;
+      const yesGrowthIntervalMs = 60;
+      let yesGrowthStopped = false;
+      let yesGrowthStarted = false;
+      let yesGrowthInterval = null;
+      let noScale = 1;
+      const noMinScale = 0.5;
+      const noShrinkStep = 0.02;
+
+      yesButton.addEventListener('click', () => {
+        yesGrowthStopped = true;
+        if (yesGrowthInterval) {
+          clearInterval(yesGrowthInterval);
+        }
+        window.location.href = 'success.html';
+      });
+      const proximityThreshold = 150; // Distance in pixels to trigger movement
+      const moveDistance = 20; // How far to move away (smaller for smoother running)
+      let stuckCounter = 0; // Counter to track how long button is stuck
+      const stuckThreshold = 15; // Number of moves before jumping to center
+
+      rectangle.addEventListener('mousemove', (e) => {
+        const buttonRect = noButton.getBoundingClientRect();
+        const rectBounds = rectangle.getBoundingClientRect();
+        
+        // Calculate button center
+        const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+        const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+        
+        // Calculate mouse position
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+        
+        // Calculate distance between mouse and button center
+        const distance = Math.sqrt(
+          Math.pow(mouseX - buttonCenterX, 2) + 
+          Math.pow(mouseY - buttonCenterY, 2)
+        );
+        
+        // If mouse is close enough, move the button away
+        if (distance < proximityThreshold && distance > 0) {
+          // Calculate direction vector from mouse to button (normalized)
+          let directionX = (buttonCenterX - mouseX) / distance;
+          let directionY = (buttonCenterY - mouseY) / distance;
+          
+          // Calculate new position (move in the opposite direction of mouse)
+          const currentLeft = parseFloat(noButton.style.left) || (buttonRect.left - rectBounds.left);
+          const currentTop = parseFloat(noButton.style.top) || (buttonRect.top - rectBounds.top);
+          
+          let newLeft = currentLeft + directionX * moveDistance;
+          let newTop = currentTop + directionY * moveDistance;
+          
+          // Keep button within bounds
+          const buttonWidth = noButton.offsetWidth;
+          const buttonHeight = noButton.offsetHeight;
+          const padding = 20;
+          const maxLeft = rectBounds.width - buttonWidth - padding;
+          const maxTop = rectBounds.height - buttonHeight - padding;
+          
+          // Check if button would be stuck at boundaries
+          const wouldBeStuckLeft = newLeft <= padding && currentLeft <= padding;
+          const wouldBeStuckRight = newLeft >= maxLeft && currentLeft >= maxLeft;
+          const wouldBeStuckTop = newTop <= padding && currentTop <= padding;
+          const wouldBeStuckBottom = newTop >= maxTop && currentTop >= maxTop;
+          
+          const isStuck = (wouldBeStuckLeft || wouldBeStuckRight) || (wouldBeStuckTop || wouldBeStuckBottom);
+          
+          // Increment stuck counter if stuck, reset if not
+          if (isStuck) {
+            stuckCounter++;
+          } else {
+            stuckCounter = 0;
+          }
+          
+          // If stuck for too long, jump toward center
+          if (stuckCounter >= stuckThreshold) {
+            const centerX = rectBounds.width / 2;
+            const centerY = rectBounds.height / 2;
+            const toCenterX = centerX - currentLeft - buttonWidth / 2;
+            const toCenterY = centerY - currentTop - buttonHeight / 2;
+            const toCenterDistance = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
+            
+            // Jump a larger distance toward center
+            newLeft = currentLeft + (toCenterX / toCenterDistance) * 150;
+            newTop = currentTop + (toCenterY / toCenterDistance) * 150;
+            stuckCounter = 0; // Reset counter after jump
+          }
+          
+          // Final boundary check
+          newLeft = Math.max(padding, Math.min(newLeft, maxLeft));
+          newTop = Math.max(padding, Math.min(newTop, maxTop));
+          
+          // Move the button
+          noButton.style.left = newLeft + 'px';
+          noButton.style.right = 'auto';
+          noButton.style.bottom = 'auto';
+          noButton.style.top = newTop + 'px';
+          if (noScale > noMinScale) {
+            noScale = Math.max(noScale - noShrinkStep, noMinScale);
+            noButton.style.setProperty('--no-scale', noScale);
+          }
+          noButton.style.transform = 'scale(var(--no-scale))';
+
+          // Start growing Yes after No moves for the first time
+          if (!yesGrowthStarted) {
+            yesGrowthStarted = true;
+            yesGrowthInterval = setInterval(() => {
+              if (yesGrowthStopped) {
+                clearInterval(yesGrowthInterval);
+                return;
+              }
+              if (yesScale >= yesMaxScale) {
+                yesScale = yesMaxScale;
+                yesButton.style.setProperty('--yes-scale', yesScale);
+                clearInterval(yesGrowthInterval);
+                return;
+              }
+              yesScale = Math.min(yesScale + yesGrowthStep, yesMaxScale);
+              yesButton.style.setProperty('--yes-scale', yesScale);
+            }, yesGrowthIntervalMs);
+          }
+        }
+      });
+    </script>
+
+  </body>
+</html>

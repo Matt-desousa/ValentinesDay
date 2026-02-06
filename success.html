@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yay!</title>
+    <style>
+    body {
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      position: relative;
+      background-color: #ffe1eb;
+    }
+
+    .rectangle {
+      width: 700px;
+      height: 400px;
+      background-color: #ffffff;
+      border-radius: 45px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30px 20px 20px 20px;
+      position: relative;
+    }
+
+    .question-image {
+      position: absolute;
+      bottom: 260px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: auto;
+      max-height: 180px;
+      object-fit: contain;
+    }
+
+    h1 {
+      margin: 0;
+      color: #000000;
+      font-size: 32px;
+      position: absolute;
+      bottom: 190px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .side-image {
+      position: absolute;
+      width: 300px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .left-image {
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .right-image {
+      right: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  </head>
+  <body>
+    <img class="side-image left-image" src="./IMG_4428.jpg" alt="">
+    <div class="rectangle">
+      <img class="question-image" src="./IMG_4504.JPG" alt="">
+      <h1>Yay! 💕</h1>
+    </div>
+    <img class="side-image right-image" src="./IMG_4543.JPG" alt="">
+    <script>
+      // Trigger confetti when page loads
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    </script>
+  </body>
+</html>
